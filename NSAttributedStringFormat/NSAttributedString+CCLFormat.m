@@ -100,6 +100,15 @@ NSArray *CCLFormatStringParser(NSString *format, NSUInteger *maxPosition) {
     return result;
 }
 
++ (instancetype)attributedStringWithAttributedFormat:(NSAttributedString *)attributedFormat format:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3) {
+    va_list args;
+    va_start(args, format);
+    NSAttributedString *result = [[self alloc] initWithAttributes:nil attributedFormat:attributedFormat format:format arguments:args];
+    va_end(args);
+    
+    return result;
+}
+
 + (instancetype)attributedStringWithFormat:(NSString *)format arguments:(va_list)arguments {
     return [[self alloc] initWithFormat:format arguments:arguments];
 }
@@ -131,9 +140,18 @@ NSArray *CCLFormatStringParser(NSString *format, NSUInteger *maxPosition) {
 }
 
 - (instancetype)initWithAttributes:(NSDictionary *)attributes format:(NSString *)format arguments:(va_list)arguments {
+    return [self initWithAttributes:attributes attributedFormat:nil format:format arguments:arguments];
+}
+
+- (instancetype)initWithAttributes:(NSDictionary *)attributes
+                  attributedFormat:(NSAttributedString *)attributedFormat
+                            format:(NSString *)format
+                         arguments:(va_list)arguments {
     NSMutableAttributedString *attributedString;
     if (attributes) {
         attributedString = [[NSMutableAttributedString alloc] initWithString:format attributes:attributes];
+    } else if (attributedFormat) {
+        attributedString = [[NSMutableAttributedString alloc] initWithAttributedString:attributedFormat];
     } else {
         attributedString = [[NSMutableAttributedString alloc] initWithString:format];
     }
